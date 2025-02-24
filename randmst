@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 import sys
 import numpy as np
-from tqdm import tqdm
 np.set_printoptions(suppress=True)
-import time
 
 #graph option 1: generates an undirected graph between n vertices with each
 #weight being uniformly distributed between 0 and 1
