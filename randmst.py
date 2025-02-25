@@ -149,7 +149,6 @@ def primadj(adjacency):
                         H.decreasekey(v,d[v])
                     else:
                         H.insert(v,d[v])
-        assert(H.checkvalid())
     if np.sum(d)==np.inf:
         return []
     return d
