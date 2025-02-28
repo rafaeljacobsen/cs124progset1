@@ -1,14 +1,22 @@
 #!/usr/bin/env python3
 import sys
 import numpy as np
-np.set_printoptions(suppress=True)
+
+np.set_printoptions(suppress=True) # No scientific notation
 
 #graph option 1: generates an undirected graph between n vertices with each
 #weight being uniformly distributed between 0 and 1
 def generate_complete_graph(n,cutoff):
+    # Using dicts of arrays for the adjacency list (different sizes, pointer to array logic)
     adjacency={i: [] for i in range(n)}
+    # Use next after to prevent generating 0
+    # np.random.uniform gives [low, high)
     randoms=np.random.uniform(low=np.nextafter(0.0, 1.0),high=1.0, size=(n, n))
+    # had a n x n uniform random matrix
+    # randoms < cutoff to get matrix with Boolean entries, True iff edge weight less than cutoff
+    # set diagonal and lower triangle to false (np.triu)
     ivals, jvals = np.where(np.triu(randoms < cutoff,k=1))
+    # for each entry set to True, add the corresponding vertex to the adjacency for both vertices
     for i, j in zip(ivals, jvals):
         adjacency[i].append([j, randoms[i, j]])
         adjacency[j].append([i, randoms[i, j]])
@@ -20,9 +28,11 @@ def generate_unit_hypercube(n,d,cutoff):
     vertices=np.random.uniform(low=np.nextafter(0.0, 1.0),
                                high=1.0,
                                size=(n,d))
-
     adjacency={i: [] for i in range(n)}
     for i in range(n):
+        # for all vertices greater than itself, take the difference as vector
+        # e.g. [x_j - x_i, y_j - y_i, z_j - z_i] (j>i)
+        # square the vector, sum, take the square root
         distances = np.sqrt(np.sum((vertices[i]-vertices[i+1:])**2, axis=1))
         valids = np.where(distances < cutoff)[0]
         for k in valids:
@@ -35,9 +45,11 @@ def generate_hypercube(n,cutoff):
     adjacency={i: [] for i in range(n)}
     k = int(np.log2(n))
     randoms = np.random.uniform(low=np.nextafter(0.0, 1.0), high=1.0, size=(n, k+1))
-
+    # the valid exponents corresponding to n
     exps=np.arange(k+1)
     for a in range(n):
+        # if i < j then the edge weight (i,j) inserted when the loop runs for i
+        # therefore, consider only + 2**i
         bs = a+2**exps
         bs=bs[bs<n]
         valids = np.where(randoms[a, :len(bs)] < cutoff)[0]
@@ -54,7 +66,6 @@ def generate_graph(n,d,cutoff):
     if d==2 or d==3 or d==4:
         return(generate_unit_hypercube(n,d,cutoff))
 
-#binary heap implementation
 class BinaryHeap:
     def __init__(self):
         #values are stored in [vertex,weight] pairs
